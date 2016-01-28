@@ -1,0 +1,267 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Gif Party Generator!!!</title>
+  <meta name="viewport" content="width=device-width"> 
+  <link rel="shortcut icon" href="//static.corgiorgy.com/img/favicon.ico">
+  <link rel="stylesheet" href="//static.corgiorgy.com/css/bootstrap.min.css">
+  <script src="//static.corgiorgy.com/js/jquery.min.js"></script>
+  <script src="//static.corgiorgy.com/js/jquery.typewatch.js"></script>
+  <style>
+  .container {
+    text-align: center;
+  }
+  .header {
+    margin-bottom: 15px;
+  }
+  form {
+    text-align: left;
+  }
+  #error-box {
+    margin-top: 23px;
+    margin-bottom: 21px;
+    display: none;
+  }
+  .uploadbutton {
+    width: 100%;
+  }
+  #foregroundinput, #backgroundinput {
+    visiblity: hidden;
+    display: none;
+  }
+  #name-help, #youtube-help {
+    display: none;
+  }
+  </style>
+</head>
+<body>
+<div class="container">
+  <center>
+    <div id="row">
+      <div class="col-sm-3"></div>
+      <div class="col-sm-7 header">
+        <h1>Throw your own gif party!!!</h1>
+        <h4 style="margin-top:15px;">How to make a <a href="http://corgiorgy.com" target="_blank">CorgiOrgy</a>-style website</h4>
+        <div id="error-box" class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          <span id="error-alert">ERROR MESSAGE</span>
+        </div>
+      </div>
+    </div>
+  </center>
+  <form action="/" id='partyform'  class="form-horizontal form" role="form-disabled">
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="foregroundimage">Foreground image:</label>
+      <div class="col-sm-7">
+        <input type="file" accept="image/*" name="foregroundinput" id="foregroundinput" class="fileholder" />
+        <button type="button" name="foregroundbutton" id="foregroundbutton" class="btn uploadbutton btn-success" onclick="$('#foregroundinput').click();" >Choose File</button> 
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="backgroundimage">Background image:</label>
+      <div class="col-sm-7">
+        <input type="file" accept="image/*" name="backgroundinput" id="backgroundinput" class="fileholder" />
+        <button type="button" name="backgroundbutton" id="backgroundbutton" class="btn uploadbutton btn-success" onclick="$('#backgroundinput').click();" />Choose File</button>
+      </div>
+    </div>
+   <form action="/" method="POST" enctype="multipart/form-data" class="form-horizontal" role="form">
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="name">Name your party:</label>
+      <div class="col-sm-7">
+        <input name="name" type="text" id="name" class="form-control" placeholder="Letters, numbers and dashes only. No spaces!">
+        <span id="name-help" class="help-block"></span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="youtube">Soundtrack link:</label>
+      <div class="col-sm-7">
+        <input name="youtube" type="text" id="youtube" class="form-control" placeholder="Optional. YouTube links only!">
+        <span id="youtube-help" class="help-block">Invalid YouTube video!</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="direction">Scroll direction:</label>
+      <div class="col-sm-7">
+        <select name='direction' id="direction" class="form-control">
+          <option value='right'>Left to Right -&gt;</option>
+          <option value='left'>Right to Left &lt;-</option>
+        </select>
+      </div>
+    </div>
+    <input type="hidden" name="foreground" id="foreground" value="">
+    <input type="hidden" name="background" id="background" value="">
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-8">
+        <button id="partybutton" type="submit" name="submit" class="btn btn-success">LET'S PARTY</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div id="ltrmarquee">
+  <marquee behavior="scroll" direction="right" speed="11">
+    <img src="http://corgiorgy.com/corgiswimflip.gif" width="150px" />
+  </marquee>
+</div>
+<div id="rtlmarquee" style="display:none;">
+  <marquee behavior="scroll" direction="left" speed="11">
+    <img src="http://corgiorgy.com/corgiswimflipflip.gif" width="150px" />
+  </marquee>
+</div>
+
+<div class="container">
+  <center>
+    <div id="row">
+      <div class="col-sm-3"></div>
+        <div class="col-sm-7 footer">
+          <center><h5><strong>by <a href='http://twitter.com/labelmaker' target='_blank'>@labelmaker</a></strong></h5></center>
+        </div>
+      </div>
+    </div>
+  </center>
+</div>
+
+<script>
+// Helpers and logic for uploading images to imgur
+document.getElementById('foregroundinput').addEventListener('change', handleUpload, false)
+document.getElementById('backgroundinput').addEventListener('change', handleUpload, false)
+function handleUpload(event) {
+  // Remove 'image' from ID name
+  var id = this.id.slice(0, -5)
+  var button = document.getElementById(id + 'button')
+  button.className = 'btn uploadbutton'
+  button.innerHTML = 'Uploading...'
+
+  var reader = new FileReader()
+  reader.onload = function(event) {
+    $.ajax({
+      type: 'POST', url: 'https://api.imgur.com/3/image',
+      headers: {
+        Authorization: 'Client-ID 5e1cd9012c3cb82',
+        Accept: 'application/json'
+      },
+      data: {
+        type: 'base64', 
+        image: event.target.result.split("base64,")[1]
+      },
+      success: function(result) {
+        document.getElementById(id).value = result.data.id
+        button.innerHTML = 'Done!'
+        button.className = 'btn uploadbutton btn-success'
+      }
+    })
+  }
+  reader.readAsDataURL(event.target.files[0]);
+}
+
+// Name validator
+CHECK_NAME_API_URL = 'http://api.corgiorgy.com/check_name'
+nameField = $('#name')
+nameHelp = $('#name-help')
+nameField.typeWatch({
+  callback: function() {
+    nameToCheck = nameField.val()
+    checkURL = CHECK_NAME_API_URL
+    if (nameToCheck.length === 0) {
+      nameField.parent().removeClass('has-error')
+      nameField.parent().removeClass('has-success')
+      nameHelp.css({'display': 'none'})
+    } else {
+      $.ajax({
+        url: CHECK_NAME_API_URL,
+        type: 'POST',
+        data: {name: nameToCheck}
+      }).done(function(data) {
+        if (data === 'InUse') {
+          nameField.parent().addClass('has-error')
+          nameHelp.text(nameToCheck + ' already in use. Pick another name!')
+          nameHelp.css({'display': 'inherit'})
+        } else if (data === 'InvalidName') {
+          nameField.parent().addClass('has-error')
+          nameHelp.text(nameToCheck + ' is not a valid name. 63 character limit! Letters, numbers and dashes only.')
+          nameHelp.css({'display': 'inherit'})
+        } else {
+          nameField.parent().removeClass('has-error')
+          nameField.parent().addClass('has-success')
+          nameHelp.css({'display': 'none'})
+        }
+      })
+    }
+  },
+  wait: 250,
+})
+
+// YoutTube link validator
+CHECK_YOUTUBE_API_URL = 'http://api.corgiorgy.com/check_youtube'
+youtubeField = $('#youtube')
+youtubeHelp = $('#youtube-help')
+youtubeField.keyup(function() {
+   youtubeToCheck = youtubeField.val()
+   if (youtubeToCheck.length === 0) {
+      youtubeField.parent().removeClass('has-error')
+      youtubeField.parent().removeClass('has-success')
+      youtubeHelp.css({'display': 'none'})
+   } else {
+      $.ajax({
+         url: CHECK_YOUTUBE_API_URL,
+         type: 'POST',
+         data: {youtube_url: youtubeToCheck}
+      }).done(function(data) {
+         if (data === 'InvalidYoutube') {
+            youtubeField.parent().addClass('has-error')
+            youtubeHelp.css({'display': 'inherit'})
+         } else {
+            youtubeField.parent().removeClass('has-error')
+            youtubeField.parent().addClass('has-success')
+            youtubeHelp.css({'display': 'none'})
+         }
+      })
+   }
+})
+
+// Let's party button handler. Creates party and redirects on success
+CREATE_PARTY_API_URL = 'http://api.corgiorgy.com/create'
+$('#partyform').submit(function(event) {
+  event.preventDefault()
+  partybutton = $('#partybutton')
+  partybutton.attr('disabled','disabled')
+  $.ajax({
+    type: 'POST',
+    url: CREATE_PARTY_API_URL,
+    data: {name: $('#name').val(),
+           foreground: $('#foreground').val(),
+           background: $('#background').val(),
+           youtube: $('#youtube').val(),
+           direction: $('#direction').val()}
+  }).success(function(new_party_url) {
+    window.location = new_party_url
+  }).fail(function(errormessage) { 
+    $('#error-box').css({'display': 'inherit'})
+    $('#error-alert').text(errormessage.responseText) 
+    partybutton.removeAttr('disabled')
+  })
+})
+
+// Corgi solo swimmer scroll direction switcher
+$(document).ready(function () {
+  $('#direction').change(function () {
+    $('#ltrmarquee').toggle()
+    $('#rtlmarquee').toggle()
+  })
+})
+
+</script>
+<script>
+// Google analytics
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-36970349-9', 'auto');
+  ga('send', 'pageview', window.location.href);
+
+</script>
+</body>
+</html>
