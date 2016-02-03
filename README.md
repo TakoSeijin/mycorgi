@@ -1,5 +1,5 @@
 # mycorgi
-Create your own [http://my.corgiorgy.com](my.corgiorgy.com)-style website
+Create your own [my.corgiorgy.com](http://my.corgiorgy.com)-style website
 
 To run:
 * Install the requirements in requirements.txt using pip
