@@ -1,5 +1,5 @@
 # mycorgi
-Create your own corgiorgy.com-style website
+Create your own [http://my.corgiorgy.com](my.corgiorgy.com)-style website
 
 To run:
 * Install the requirements in requirements.txt using pip
@@ -9,4 +9,4 @@ To run:
 * Run "python setup.py"
 * Run "uwsgi --socket 0.0.0.0:8000 --protocol=http -w wsgi"
 
-If you need any help you can reach me on Twitter @labelmaker. Have fun!
+If you need any help you can reach me on Twitter [@labelmaker](https://twitter.com/labelmaker). Have fun!
